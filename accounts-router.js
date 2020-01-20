@@ -1,15 +1,25 @@
 const express = require("express");
-const { get, insert, remove, update } = require("./accounts-model");
+const { get, getByQuery, insert, remove, update } = require("./accounts-model");
 
 const router = express.Router();
 
 //GET ROUTES
 router.get("/", async (req, res, next) => {
-  try {
-    const accounts = await get();
-    res.status(200).json(accounts);
-  } catch (error) {
-    next(error);
+  const { limit, sortby, sortdir } = req.query;
+  if (limit || sortby || sortdir) {
+    try {
+      const results = await getByQuery({ limit, sortby, sortdir });
+      res.status(200).json(results);
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    try {
+      const accounts = await get();
+      res.status(200).json(accounts);
+    } catch (error) {
+      next(error);
+    }
   }
 });
 
